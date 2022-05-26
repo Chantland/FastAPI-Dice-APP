@@ -28,6 +28,15 @@ def get_db():
 
 ####################
 
+########### For Dice Picture ##########
+import Dice_Picture
+
+# pic = Dice_Picture.dicePic("static/images/J&E_Saint_L.jpg")
+# pic = Dice_Picture.dicePic("Images_DELETE\\J&E_Abby_Wedding.jpg")
+pic = Dice_Picture.dicePic("static/images/J&E_Saint_L.jpg", inp_prompt=False)
+pic.possible_blocks()   
+
+#######################################
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -51,10 +60,7 @@ async def create_upload_file(request: Request, file: UploadFile):
     return templates.TemplateResponse("item.html",{"request":request, "bef_img": response})
 
 
-# @app.post("/uploadfiles/")
-# async def create_upload_file(request: Request, file: UploadFile = File(...)):
-#     return FileResponse(f'static/images/{file.filename}') 
-     
+
 
 @app.post("/files/")
 async def create_file(
