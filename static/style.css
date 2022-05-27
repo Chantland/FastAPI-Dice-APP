@@ -17,3 +17,12 @@ img {
 section {
     white-space:nowrap;
 }
+
+
+.imgshow {
+    display: inline;
+}
+
+/* .before_image {
+    display: None;
+} */

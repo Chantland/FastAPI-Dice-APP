@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page </title>
     <link href="{{ url_for('static', path='/style.css') }}" rel="stylesheet">
+    <script src = "{{ url_for('static', path='/JS-styling.js') }}"></script>
 
 </head>
 
@@ -15,12 +16,32 @@
 
 
 <body>
-    
-    <form action="/uploadfiles/" enctype="multipart/form-data" method="post">
+    <div>{{ sample_text }}</div>
+    <p> This will spew out the files to the next page if you hit submit</p>
+    <form action="/originaluploadfiles/" enctype="multipart/form-data" method="post">
     <input name="file" type="file">
     <input type="submit">
     </form>
+    <hr>
+    <p> This will (hopefully) upload to the database</p>
+    <form action="/uploadfiles/" enctype="multipart/form-data" method="post" onsubmit="imgshow()">  <!--onsubmit, this is meant to reveal, but it does not work as intended -->
+    <input name="file" type="file">
+    <input type="submit">
+    </form>
+    <br>
+
+    <!-- <img class= "before_image" src="{{ url_for('static', path='images/placeholder.png') }}" alt="before" title="before" onerror="imgError(this);"/> -->
+    {% for pic in pic_list %}
+    <span>
+    <hr>
+    <p> {{pic.filename}}
+        <a href ="/delete/{{pic.id}}"> Delete</a>
+    </p>
+
+    <img class= "before_image" src="{{ url_for('static', path='images/'+ pic.filename) }}" alt="before" title="before" onerror="imgError(this);"/>
     
-    <!-- <img src="/uploadfiles/" alt="Wedding outfit before dice" title="After"/> -->
+    </span>
+    {% endfor %}
+
 </body>
 </html>
