@@ -108,7 +108,7 @@ import Dice_Picture
 
 @app.get("/")    
 async def main(request: Request, db: Session = Depends(get_db)):
-    Bef_img = db.query(models.Bef_img).all()
+    Bef_img = db.query(models.Pics).all()
     return templates.TemplateResponse("main.html",{"request":request, "pic_list":Bef_img})  #for localizing to a page
 
 
@@ -121,7 +121,7 @@ async def create_upload_file(request: Request, file: UploadFile):
 # @app.post("/uploadfiles/")
 # async def create_upload_file(request: Request, file: UploadFile, db: Session = Depends(get_db)):
 #     url = app.url_path_for("main")
-#     new_img = models.Bef_img(filename = file.filename)
+#     new_img = models.Pics(filename = file.filename)
 #     db.add(new_img)
 #     db.commit()
 #     return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
@@ -140,7 +140,7 @@ async def create_upload_file(request: Request, file: UploadFile):
 #     #img_show(img) #may not be necessary but proof of concept,
 #     cv2.imwrite("./static/images/placeholder.png", img)
 
-#     new_img = models.Bef_img(filename = file.filename, size_x = size_x, size_y=size_y, data=img)
+#     new_img = models.Pics(filename = file.filename, size_x = size_x, size_y=size_y, data=img)
 #     db.add(new_img)
 #     db.commit()
 #     return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
@@ -176,7 +176,7 @@ async def create_upload_file(request: Request, file: UploadFile, db: Session = D
         file_path = "./static/images/" + file.filename
     except:
         pic_fail = True
-        Bef_img = db.query(models.Bef_img).all()
+        Bef_img = db.query(models.Pics).all()
         return templates.TemplateResponse("main.html", {"request": request, "pic_fail": pic_fail, "pic_list":Bef_img})
 
     cv2.imwrite(file_path, img)
@@ -185,10 +185,12 @@ async def create_upload_file(request: Request, file: UploadFile, db: Session = D
         pic = Dice_Picture.dicePic(file_path, inp_prompt=False)
     except:
         sassy = True
-        Bef_img = db.query(models.Bef_img).all()
+        Bef_img = db.query(models.Pics).all()
         return templates.TemplateResponse("main.html", {"request": request, "sassy": sassy, "pic_list":Bef_img})
 
-    before_img = models.Bef_img(filename = file.filename, size_x = size_x, size_y=size_y, data=img)
+    Dice_option_list = pic.posDiceNum
+
+    before_img = models.Pics(Bef_filename = file.filename, size_x = size_x, size_y=size_y, data=img)
     db.add(before_img)
     db.commit()
     return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
@@ -198,7 +200,7 @@ async def create_upload_file(request: Request, file: UploadFile, db: Session = D
 
 @app.get("/delete/{pic_id}")
 def delete(request: Request, pic_id: int, db: Session = Depends(get_db)):
-    pic_d = db.query(models.Bef_img).filter(models.Bef_img.id == pic_id).first()
+    pic_d = db.query(models.Pics).filter(models.Pics.id == pic_id).first()
     db.delete(pic_d)
     db.commit()
 

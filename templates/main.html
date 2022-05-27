@@ -16,12 +16,7 @@
 
 
 <body>
-    <div>{{ sample_text }}</div>
-    <p> This will spew out the files to the next page if you hit submit</p>
-    <form action="/originaluploadfiles/" enctype="multipart/form-data" method="post">
-    <input name="file" type="file">
-    <input type="submit">
-    </form>
+
     <hr>
     <p> This will (hopefully) upload to the database</p>
     <form action="/uploadfiles/" enctype="multipart/form-data" method="post" onsubmit="imgshow()">  <!--onsubmit, this is meant to reveal, but it does not work as intended -->
@@ -50,12 +45,12 @@
     {% for pic in pic_list %}
     <span >
     <hr>
-    <p> {{pic.filename}}
+    <p> {{pic.Bef_filename}}
         <a href ="/delete/{{pic.id}}"> Delete</a>
         
     </p>
 
-    <img class= "before_image"  src="{{ url_for('static', path='images/'+ pic.filename) }}" alt="before" title="before" onerror="imgError(this);"/>
+    <img class= "before_image"  src="{{ url_for('static', path='images/'+ pic.Bef_filename) }}" alt="before" title="before" onerror="imgError(this);"/>
     <div></div>
     </span>
     {% endfor %}
