@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page </title>
-    <link href="{{ url_for('static', path='/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
     <script src = "{{ url_for('static', path='/JS-styling.js') }}"></script>
 
 </head>
@@ -30,18 +30,41 @@
     </form>
     <br>
 
-    <!-- <img class= "before_image" src="{{ url_for('static', path='images/placeholder.png') }}" alt="before" title="before" onerror="imgError(this);"/> -->
+
+    {% if sassy == True %}
+    <div class = "sassyness"> WARNING The picture you chose cannot be evenly subdivided. Either crop it or choose a different picture</div>
+
+    <!-- <script>
+    function alert_Function() {
+        alert("The picture you chose cannot be subdivided. Either crop it or choose a different one");
+        var sassy = False;
+    }
+    window.onload = alert_Function();
+    </script> -->
+    {% endif %}
+
+    {% if pic_fail == True %}
+    <div class = "sassyness"> WARNING cannot read, make sure you are submitting a picture</div>
+    {% endif %}
+
     {% for pic in pic_list %}
-    <span>
+    <span >
     <hr>
     <p> {{pic.filename}}
         <a href ="/delete/{{pic.id}}"> Delete</a>
+        
     </p>
 
-    <img class= "before_image" src="{{ url_for('static', path='images/'+ pic.filename) }}" alt="before" title="before" onerror="imgError(this);"/>
-    
+    <img class= "before_image"  src="{{ url_for('static', path='images/'+ pic.filename) }}" alt="before" title="before" onerror="imgError(this);"/>
+    <div></div>
     </span>
     {% endfor %}
 
+    <select name="cars" id="cars">
+        <option value="volvo">Volvo</option>
+        <option value="saab">Saab</option>
+        <option value="opel">Opel</option>
+        <option value="audi">Audi</option>
+      </select>
 </body>
 </html>

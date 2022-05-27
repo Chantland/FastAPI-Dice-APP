@@ -1,7 +1,7 @@
 from typing import Union, Optional, List
 from fastapi import Depends, FastAPI, Request, File, UploadFile, status, Form
 
-from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -25,6 +25,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # app.mount("/templates/images", StaticFiles(directory="templates/images"), name="images")
 
 templates = Jinja2Templates(directory="templates")
+
+import uvicorn
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 
 
@@ -91,8 +95,15 @@ import Dice_Picture
 
 
 #######################################
+# class ItemCreate(ItemBase):
+#     pass
 
-
+# def create_user_item(db: Session, item: ItemCreate, user_id: int):
+#     db_item = models.Aft_img(owner_id=user_id)
+#     db.add(db_item)
+#     db.commit()
+#     db.refresh(db_item)
+#     return db_item
 
 
 @app.get("/")    
@@ -135,23 +146,53 @@ async def create_upload_file(request: Request, file: UploadFile):
 #     return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
 # # # <!-- <img class= "optional_show" src="{{ url_for('static', path='images/placeholder.png') }}" alt="before" title="before" onerror="imgError(this);"/> --> 
 
+
+import Dice_Picture
+
+# # pic = Dice_Picture.dicePic("static/images/J&E_Saint_L.jpg")
+# # pic = Dice_Picture.dicePic("Images_DELETE\\J&E_Abby_Wedding.jpg")
+# pic = Dice_Picture.dicePic("static/images/J&E_Saint_L.jpg", inp_prompt=False)                  
+# pic.dice_alt(pic.posDiceNum[7])             
+# pic.inp_Dice(perc_pip=.06, dice_dict=None)                                            
+# pic.showIm(pic.img_Dice_Pic, print_img=False)   
+# pic.printIm()
+
+
+
+
+
+
 # working 3
+
 @app.post("/uploadfiles/")
 async def create_upload_file(request: Request, file: UploadFile, db: Session = Depends(get_db)):
     url = app.url_path_for("main")
 
-    contents = await file.read()
-    nparr = np.fromstring(contents, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    try:
+        contents = await file.read()
+        nparr = np.fromstring(contents, np.uint8)   #I wonder if the dice_pic could do this... best check later
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        size_x, size_y = img.shape[0:2]
+        file_path = "./static/images/" + file.filename
+    except:
+        pic_fail = True
+        Bef_img = db.query(models.Bef_img).all()
+        return templates.TemplateResponse("main.html", {"request": request, "pic_fail": pic_fail, "pic_list":Bef_img})
 
-    size_x, size_y = img.shape[0:2]
-    #img_show(img) #may not be necessary but proof of concept,
-    cv2.imwrite("./static/images/" + file.filename, img)
+    cv2.imwrite(file_path, img)
 
-    new_img = models.Bef_img(filename = file.filename, size_x = size_x, size_y=size_y, data=img)
-    db.add(new_img)
+    try:
+        pic = Dice_Picture.dicePic(file_path, inp_prompt=False)
+    except:
+        sassy = True
+        Bef_img = db.query(models.Bef_img).all()
+        return templates.TemplateResponse("main.html", {"request": request, "sassy": sassy, "pic_list":Bef_img})
+
+    before_img = models.Bef_img(filename = file.filename, size_x = size_x, size_y=size_y, data=img)
+    db.add(before_img)
     db.commit()
     return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
+
 
     
 
@@ -177,15 +218,3 @@ async def create_file(
         "fileb_content_type": fileb.content_type,
     }
 
-
-
-#probably delete this in time
-@app.get("/items/{ids}", response_class=HTMLResponse)
-async def read_item(request: Request, ids: str):
-    return templates.TemplateResponse("item.html", {"request": request, "id": ids})
-
-
-
-
-# "GET /delete/2 HTTP/1.1" 302 Found
-# "GET /delete1 HTTP/1.1" 404 Not Found

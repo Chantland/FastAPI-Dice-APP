@@ -13,7 +13,7 @@ class Bef_img(Base):
     size_y = Column(Integer)
     data = Column(Unicode)
 
-    converted_img = relationship("Aft_img", back_populates="original_img")
+    converted_img = relationship("Aft_img", cascade="all,delete-orphan", back_populates="original_img")
 
 class Aft_img(Base):
     __tablename__ = "after_image"
@@ -21,7 +21,6 @@ class Aft_img(Base):
     filename = Column(String)
     size_x = Column(Integer)
     size_y = Column(Integer)
-    data = Column(Unicode)
     orig_id = Column(Integer, ForeignKey("before_image.id"))
 
     original_img = relationship("Bef_img", back_populates="converted_img")
