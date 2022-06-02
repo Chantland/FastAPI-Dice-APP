@@ -1,3 +1,7 @@
+# requirements file: pip install -r requirements.txt
+# does not include: fastapi Uvicorn, SQLalchemy, CV2, or multipart 
+# (pip install fastapi uvicorn SQLalchemy opencv-python python-multipart)
+
 from typing import Union, Optional, List
 from fastapi import Depends, FastAPI, Request, File, UploadFile, status, Form
 
@@ -26,6 +30,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
+# run on command
 import uvicorn
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
