@@ -18,14 +18,13 @@ class Pics(Base):
     size_y = Column(Integer)
     data = Column(Unicode)
 
-    # converted_img = relationship("Aft_img", cascade="all,delete-orphan", back_populates="original_img")
+    potent_dice_dim = relationship("Dice_Dim", cascade="all,delete-orphan", back_populates="original_img")
 
-# class Aft_img(Base):
-#     __tablename__ = "after_image"
-#     id = Column(Integer, primary_key=True, index=True)
-#     filename = Column(String)
-#     size_x = Column(Integer)
-#     size_y = Column(Integer)
-#     orig_id = Column(Integer, ForeignKey("before_image.id"))
+class Dice_Dim(Base):
+    __tablename__ = "dice_dim"
+    id = Column(Integer, primary_key=True, index=True)
+    size_x = Column(Integer)
+    size_y = Column(Integer)
+    orig_id = Column(Integer, ForeignKey("pics.id"))
 
-#     original_img = relationship("Bef_img", back_populates="converted_img")
+    original_img = relationship("Pics", back_populates="potent_dice_dim")

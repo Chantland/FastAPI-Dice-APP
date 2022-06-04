@@ -54,7 +54,9 @@ class dicePic():
 
         mod_product_list.sort()
         dicePixSizeList = []
-        for iDiv in mod_product_list:  #take the possible pixel sizes and divide them from the image to get number of dice
+        # take the possible pixel sizes and divide them from the image to get number of dice
+        # skip first run as this is just the actual picture size and why would you want that?
+        for iDiv in mod_product_list[1:]:  
             dicePixSizeList.append([ver_y/iDiv, hor_x / iDiv])
         dicePixSizeList = np.array(dicePixSizeList, dtype=np.intp)
         # for displaying the possible dice that could fit in the picture.
@@ -358,29 +360,34 @@ class dicePic():
 
 
 
-    def printIm(self):
+    def printIm(self, file_dup = False):
         import cv2
         import os
 
         directory = os.getcwd()  # get current directory
-        output_dir = "Image-Output"  # output directory
+        output_dir = "static/Image-Output"  # output directory
         output_dir_path = directory + '/' + output_dir  # output directory path
         os.makedirs(output_dir_path, exist_ok=True)  # make Image-Output folder if it does not exist
 
         # create the dimension add-ons  for sake of clarity and later use
         img_dim_name = self.y_dice.astype('str') + "y" + self.x_dice.astype('str') + "x"
-        # find all duplicates images which share the dimensions as the one we are about to save.
-        file_copy = 0
-        for i_string in os.listdir(output_dir_path):
-            if img_dim_name in i_string and self.image_name in i_string:
-                last_digit = i_string.split('-')[-1].split(".")[
-                    0]  # split by the dashes then leave off the file extension
-                last_digit = int(last_digit)
-                file_copy = max(file_copy, last_digit)
-        file_copy = str(file_copy + 1)  # do one more than the present number of image duplicates
+
+        # Allows for different file names to be created so that original file is not overwritten
+        if file_dup is True:
+            # find all duplicates images which share the dimensions as the one we are about to save.
+            file_copy = 0
+            for i_string in os.listdir(output_dir_path):
+                if img_dim_name in i_string and self.image_name in i_string:
+                    last_digit = i_string.split('-')[-1].split(".")[
+                        0]  # split by the dashes then leave off the file extension
+                    last_digit = int(last_digit)
+                    file_copy = max(file_copy, last_digit)
+            file_copy = "-" + str(file_copy + 1)  # do one more than the present number of image duplicates
+        else:
+            file_copy = ""
 
         # prepare filename, add self. for ease of confirming file name
-        self.filename = self.image_name + "-" + img_dim_name + "-" + file_copy + ".png"  # png here is cleaner and smaller file size
+        self.filename = self.image_name + "-" + img_dim_name + file_copy + ".png"  # png here is cleaner and smaller file size
 
-        cv2.imwrite(output_dir + "/static/" + self.filename, self.img_Dice_Pic)  # write the file to folder  NOTE "static" was added specificaly for the API
+        cv2.imwrite(output_dir_path + '/' + self.filename, self.img_Dice_Pic)  # write the file to folder  NOTE "static" was added specificaly for the API
 

@@ -16,7 +16,7 @@ import uuid
 import cv2
 import numpy as np
 
-import models
+import models, crud, Dice_Picture
 from database import SessionLocal, engine
 
 
@@ -84,95 +84,27 @@ def get_db():
 #     return workspace
 #####
 
-########### For Dice Picture ##########
 
 
-import Dice_Picture
-
-# # pic = Dice_Picture.dicePic("static/images/J&E_Saint_L.jpg")
-# # pic = Dice_Picture.dicePic("Images_DELETE\\J&E_Abby_Wedding.jpg")
-# pic = Dice_Picture.dicePic("static/images/J&E_Saint_L.jpg", inp_prompt=False)  
-# pic.possible_blocks()                       
-# pic.dice_alt(pic.posDiceNum[7])             
-# pic.inp_Dice(perc_pip=.06, dice_dict=None)                                            
-# pic.showIm(pic.img_Dice_Pic, print_img=False)   
-# pic.printIm()
 
 
-#######################################
-# class ItemCreate(ItemBase):
-#     pass
-
-# def create_user_item(db: Session, item: ItemCreate, user_id: int):
-#     db_item = models.Aft_img(owner_id=user_id)
-#     db.add(db_item)
-#     db.commit()
-#     db.refresh(db_item)
-#     return db_item
 
 
 @app.get("/")    
 async def main(request: Request, db: Session = Depends(get_db)):
-    Bef_img = db.query(models.Pics).all()
-    return templates.TemplateResponse("main.html",{"request":request, "pic_list":Bef_img})  #for localizing to a page
-
-
-@app.post("/originaluploadfiles/")
-async def create_upload_file(request: Request, file: UploadFile):
-    response = f'images/{file.filename}'
-    return templates.TemplateResponse("item.html",{"request":request, "bef_img": response})
-
-# # working 1
-# @app.post("/uploadfiles/")
-# async def create_upload_file(request: Request, file: UploadFile, db: Session = Depends(get_db)):
-#     url = app.url_path_for("main")
-#     new_img = models.Pics(filename = file.filename)
-#     db.add(new_img)
-#     db.commit()
-#     return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
-# <!-- <img src="/uploadfiles/" alt="Wedding outfit before dice" title="After"/> --> <!-- for working draft 1 -->
-
-# # # working 2
-# @app.post("/uploadfiles/")
-# async def create_upload_file(request: Request, file: UploadFile, db: Session = Depends(get_db)):
-#     url = app.url_path_for("main")
-
-#     contents = await file.read()
-#     nparr = np.fromstring(contents, np.uint8)
-#     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-#     size_x, size_y = img.shape[0:2]
-#     #img_show(img) #may not be necessary but proof of concept,
-#     cv2.imwrite("./static/images/placeholder.png", img)
-
-#     new_img = models.Pics(filename = file.filename, size_x = size_x, size_y=size_y, data=img)
-#     db.add(new_img)
-#     db.commit()
-#     return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
-# # # <!-- <img class= "optional_show" src="{{ url_for('static', path='images/placeholder.png') }}" alt="before" title="before" onerror="imgError(this);"/> --> 
-
-
-import Dice_Picture
-
-# # pic = Dice_Picture.dicePic("static/images/J&E_Saint_L.jpg")
-# # pic = Dice_Picture.dicePic("Images_DELETE\\J&E_Abby_Wedding.jpg")
-# pic = Dice_Picture.dicePic("static/images/J&E_Saint_L.jpg", inp_prompt=False)                  
-# pic.dice_alt(pic.posDiceNum[7])             
-# pic.inp_Dice(perc_pip=.06, dice_dict=None)                                            
-# pic.showIm(pic.img_Dice_Pic, print_img=False)   
-# pic.printIm()
-
-
-
+    # Bef_img = db.query(models.Pics).all()
+    # return templates.TemplateResponse("main.html",{"request":request, "pic_list":Bef_img})  #for localizing to a page
+    return templates.TemplateResponse("main.html", {"request":request, **crud.pic_inject(db=db)})
 
 
 
 # working 3
-
 @app.post("/uploadfiles/")
 async def create_upload_file(request: Request, file: UploadFile, db: Session = Depends(get_db)):
     url = app.url_path_for("main")
 
+    # implement and scan the imgage (if no image or bad file submitted, send warning variable)
+    # right now storing the size and data is superfluous, change later
     try:
         contents = await file.read()
         nparr = np.fromstring(contents, np.uint8)   #I wonder if the dice_pic could do this... best check later
@@ -180,24 +112,31 @@ async def create_upload_file(request: Request, file: UploadFile, db: Session = D
         size_x, size_y = img.shape[0:2]
         file_path = "./static/images/" + file.filename
     except:
-        pic_fail = True
-        Bef_img = db.query(models.Pics).all()
-        return templates.TemplateResponse("main.html", {"request": request, "pic_fail": pic_fail, "pic_list":Bef_img})
+        pic_fail = "WARNING cannot read, make sure you are submitting a picture"
+        return templates.TemplateResponse("main.html", {"request":request, **crud.pic_inject(pic_fail=pic_fail, db=db)})
 
     cv2.imwrite(file_path, img)
 
+    # initiate dice image, if the image cannot be subdivided, send warning variable)
     try:
         pic = Dice_Picture.dicePic(file_path, inp_prompt=False)
     except:
-        sassy = True
-        Bef_img = db.query(models.Pics).all()
-        return templates.TemplateResponse("main.html", {"request": request, "sassy": sassy, "pic_list":Bef_img})
-
-    Dice_option_list = pic.posDiceNum
-
+        pic_fail = "WARNING The picture you chose cannot be evenly subdivided. Either crop it or choose a different picture"
+        return templates.TemplateResponse("main.html", {"request":request, **crud.pic_inject(pic_fail=pic_fail, db=db)})
+    
     before_img = models.Pics(Bef_filename = file.filename, size_x = size_x, size_y=size_y, data=img)
     db.add(before_img)
     db.commit()
+
+    # add all the dice permutations (need to convert numpy integers to integers or else returns a blob)
+    Dice_option_list = pic.posDiceNum
+    dice_dimensions = []
+    for YandX in Dice_option_list:
+        model_input = models.Dice_Dim(size_x = int(YandX[1]), size_y = int(YandX[0]), orig_id = before_img.id)
+        dice_dimensions.append(model_input)
+    db.add_all(dice_dimensions)
+    db.commit()
+
     return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -214,14 +153,31 @@ def delete(request: Request, pic_id: int, db: Session = Depends(get_db)):
     
 
 
+@app.get("/dice_prog/")
+def dice_prog(request: Request, dice_perm: int, db: Session = Depends(get_db)):
+    print(dice_perm) #DELETE for checking number returned
 
-@app.post("/files/")
-async def create_file(
-    file: bytes = File(), fileb: UploadFile = File(), token: str = Form()
-):
-    return {
-        "file_size": len(file),
-        "token": token,
-        "fileb_content_type": fileb.content_type,
-    }
+    # find the original dice dimensions selected and the original file name.
+    dice_dim_size = db.query(models.Dice_Dim).filter(models.Dice_Dim.id == dice_perm).first()
+    orig_image = db.query(models.Pics).filter(models.Pics.id == dice_dim_size.orig_id).first()
+    pic = Dice_Picture.dicePic("static/images/" + orig_image.Bef_filename, inp_prompt=False)
+    dim_array = np.array([dice_dim_size.size_y, dice_dim_size.size_x])
+    pic.dice_alt(dim_array)
+    pic.inp_Dice(perc_pip=.06, dice_dict=None) 
+    pic.printIm()
 
+    orig_image.Aft_filename = pic.filename
+    orig_image.Computed = True
+    db.commit()
+
+
+    Bef_img = db.query(models.Pics).all()
+    return templates.TemplateResponse("main.html", {"request":request, **crud.pic_inject(db=db)})
+
+    #working dice_prog1
+# @app.get("/dice_prog/")
+# def dice_prog(request: Request, dice_perm: Union[str, None] = None, db: Session = Depends(get_db)):
+#     print(dice_perm)
+#     pic_fail = True
+#     Bef_img = db.query(models.Pics).all()
+#     return templates.TemplateResponse("main.html", {"request": request, "pic_fail": pic_fail, "pic_list":Bef_img})
