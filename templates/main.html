@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page </title>
-    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', path='/styler.css') }}" rel="stylesheet">
     <script src = "{{ url_for('static', path='/JS-styling.js') }}"></script>
 
     <!-- for removing favicon.ico 404 error, DELETE for production-->
@@ -32,6 +32,7 @@
     <br>
     </div>
 
+
     <!--Script for entering error messages but I cannot sem to allow for variable to react to the sent template response  -->
     <!-- <script>
         var sassy;
@@ -57,10 +58,10 @@
     {% for pic in pic_list %}
     <span >
     
-        <p> {{pic.Bef_filename}}
+        <p> {{pic.Bef_filename}} 
             <a class = "delete", href ="/delete/{{pic.id}}"> Delete</a>
-            
         </p>
+        
 
         <div>
         <img src="{{ url_for('static', path='images/'+ pic.Bef_filename) }}" alt="before image" title="before" onerror="imgError(this);"/>

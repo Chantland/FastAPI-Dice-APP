@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 
 from sqlalchemy.orm import Session
 
-import uuid
+
 
 import cv2
 import numpy as np
