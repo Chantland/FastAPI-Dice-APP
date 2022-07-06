@@ -1,6 +1,6 @@
 # requirements file: pip install -r requirements.txt
-# does not include: fastapi Uvicorn, SQLalchemy, CV2, or multipart 
-# You mau use:  pip install fastapi uvicorn SQLalchemy opencv-python python-multipart
+# There is a chance this may not include: fastapi Uvicorn, SQLalchemy, CV2, or multipart 
+# If so, You may use:  pip install fastapi uvicorn SQLalchemy opencv-python python-multipart
 
 
 # To run type in the terminal:   uvicorn main:app --reload    
