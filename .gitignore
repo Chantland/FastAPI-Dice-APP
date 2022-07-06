@@ -1,2 +1,8 @@
 
 venv
+.*
+Demo_images
+db.sqlite
+main_OLD.py
+Demo.py
+.idea

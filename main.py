@@ -1,6 +1,6 @@
 # requirements file: pip install -r requirements.txt
 # does not include: fastapi Uvicorn, SQLalchemy, CV2, or multipart 
-# (pip install fastapi uvicorn SQLalchemy opencv-python python-multipart)
+# You mau use:  pip install fastapi uvicorn SQLalchemy opencv-python python-multipart
 
 from typing import Union, Optional, List
 from fastapi import Depends, FastAPI, Request, File, UploadFile, status, Form
@@ -44,47 +44,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-####### demo dependancies ########
-
-# from pydantic import BaseSettings
-
-
-# class Settings(BaseSettings):
-#     work_dir: str = 'static/upload/'
-#     thumb_width: int = 340
-#     thumb_height: int = 800
-#     thumb_size: tuple = (300, 500)
-#     max_imgWidth: int = 600
-#     max_imgHeight: int = 800
-
-
-# settings = Settings()
-
-
-
-# import os.path
-# import uuid
-# from pathlib import Path
-# def create_workspace():
-#     """
-#     Return workspace 
-#     """
-#     # base directory
-#     work_dir = Path(settings.work_dir)
-#     # UUID to prevent file overwrite
-#     request_id = Path(str(uuid.uuid4())[:8])
-#     # path concat instead of work_dir + '/' + request_id
-#     workspace = work_dir / request_id
-#     if not os.path.exists(workspace):
-#         # recursively create workdir/unique_id
-#         os.makedirs(workspace)
-
-#     return workspace
-#####
-
-
 
 
 
