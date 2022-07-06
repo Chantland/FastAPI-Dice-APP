@@ -8,7 +8,7 @@ An API for uploading and converting pictures into a dice mosiac via Dice_Me http
   <img src="https://github.com/Chantland/Chantland.github.io/blob/master/img/FastAPI_Dice_Ex.png" width="1000" style="border:1px solid black" alt="Before Dice">
 </kbd>
 
-Current implementation allows for changing of dice dimensions and may allow for optional imputs later. For full optional inputs, check out the original Dice_Me at Dice_Me https://github.com/Chantland/Dice_Me. You can also use the Dice_Me.py included here, however, NOTE that this Dice_ME.py has been altered slightly to work better with the API and may easily allow for all the optional inputs.
+Current implementation allows for changing of dice dimensions and may allow for optional imputs later. For full optional inputs, check out the original Dice_Me at Dice_Me https://github.com/Chantland/Dice_Me. You can also use the Dice_Me.py included here, however, NOTE that this Dice_ME.py has been altered slightly to work better with the API so might not work exactly as intended on its own.
 
 ## Setup
 1. Make sure that you have the required packages listed in `requirements.txt`. Use `pip install -r requirements.txt` if unsure. Additionally, sometimes some requirements are left out and require separate pip installations. If this is the case, consider using `pip install fastapi uvicorn SQLalchemy opencv-python python-multipart` 
