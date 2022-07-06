@@ -1,8 +1,9 @@
 
 .*
+
 db.sqlite
 
-**_OLD*
+
 /.idea/
 /.vscode/
 /venv/
@@ -11,3 +12,5 @@ main_OLD.html
 
 Dice_Picture.py
 Dice_Picture copy.py
+__pycache__*
+static/Image-Output/
