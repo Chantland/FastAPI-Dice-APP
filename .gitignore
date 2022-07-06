@@ -8,4 +8,6 @@ db.sqlite
 /venv/
 
 main_OLD.html
-templates/main_OLD.html
+
+Dice_Picture.py
+Dice_Picture copy.py

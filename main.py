@@ -2,6 +2,12 @@
 # does not include: fastapi Uvicorn, SQLalchemy, CV2, or multipart 
 # You mau use:  pip install fastapi uvicorn SQLalchemy opencv-python python-multipart
 
+
+# To run type in the terminal:   uvicorn main:app --reload    
+# You must have all the packages installed. 
+
+
+
 from typing import Union, Optional, List
 from fastapi import Depends, FastAPI, Request, File, UploadFile, status, Form
 
@@ -16,11 +22,11 @@ from sqlalchemy.orm import Session
 import cv2
 import numpy as np
 
-import models, crud, Dice_Picture
+import models, crud, Dice_Me
 from database import SessionLocal, engine
 
 
-
+   
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
@@ -78,7 +84,7 @@ async def create_upload_file(request: Request, file: UploadFile, db: Session = D
 
     # initiate dice image, if the image cannot be subdivided, send warning variable)
     try:
-        pic = Dice_Picture.dicePic(file_path, inp_prompt=False)
+        pic = Dice_Me.dicePic(file_path, inp_prompt=False)
     except:
         pic_fail = "WARNING The picture you chose cannot be evenly subdivided. Either crop it or choose a different picture"
         return templates.TemplateResponse("main.html", {"request":request, **crud.pic_inject(pic_fail=pic_fail, db=db)})
@@ -119,7 +125,7 @@ def dice_prog(request: Request, dice_perm: int, db: Session = Depends(get_db)):
     # find the original dice dimensions selected and the original file name.
     dice_dim_size = db.query(models.Dice_Dim).filter(models.Dice_Dim.id == dice_perm).first()
     orig_image = db.query(models.Pics).filter(models.Pics.id == dice_dim_size.orig_id).first()
-    pic = Dice_Picture.dicePic("static/images/" + orig_image.Bef_filename, inp_prompt=False)
+    pic = Dice_Me.dicePic("static/images/" + orig_image.Bef_filename, inp_prompt=False)
     dim_array = np.array([dice_dim_size.size_y, dice_dim_size.size_x])
     pic.dice_alt(dim_array)
     pic.inp_Dice(perc_pip=.06, dice_dict=None) 
