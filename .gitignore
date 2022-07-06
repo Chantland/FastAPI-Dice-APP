@@ -1,8 +1,11 @@
 
-venv
 .*
-Demo_images
 db.sqlite
-main_OLD.py
-Demo.py
-.idea
+
+**_OLD*
+/.idea/
+/.vscode/
+/venv/
+
+main_OLD.html
+templates/main_OLD.html
